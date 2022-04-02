@@ -153,7 +153,6 @@ const utilityPatterns: Record<string, string | [string, string | string[]]> = {
   "max-h": "maxHeight",
   // Typography
   leading: "lineHeight",
-  font: "fontWeight",
   tracking: "letterSpacing",
   indent: "textIndent",
   // Backgrounds
@@ -181,7 +180,7 @@ const negativeProperties = [
 
 interface Value {
   value: string | number;
-  type?: "color" | "unit" | "other";
+  type?: "color" | "unit" | "numeric" | "other";
   isCustom?: boolean;
   additionalProperties?: StyleSheet;
 }
@@ -238,6 +237,13 @@ function createTw(userConfig?: TailwindConfig) {
     }
   }
 
+  function getCustomValue(value: string) {
+    if (value.startsWith("[") && value.endsWith("]")) {
+      return value.slice(1, value.length - 1).replaceAll("_", " ");
+    }
+    return null;
+  }
+
   function parseValue(
     value: string,
     property?: string,
@@ -246,8 +252,8 @@ function createTw(userConfig?: TailwindConfig) {
     const valueParts = value.split("-");
 
     // Custom value
-    if (value.startsWith("[") && value.endsWith("]")) {
-      const customValue = value.slice(1, value.length - 1).replaceAll("_", " ");
+    const customValue = getCustomValue(value);
+    if (customValue) {
       // Color
       if (
         ["#", "rgb", "hsl"].some((prefix) => customValue.startsWith(prefix))
@@ -269,6 +275,7 @@ function createTw(userConfig?: TailwindConfig) {
       // Other
       return {
         value: transformValue(customValue, property, isNegative),
+        type: "other",
         isCustom: true,
       };
     }
@@ -392,6 +399,31 @@ function createTw(userConfig?: TailwindConfig) {
               left: value,
             };
         }
+      }
+
+      case "font": {
+        const valueStr = utilityParts.slice(1).join("-");
+        const customValue = getCustomValue(valueStr);
+        if (customValue) {
+          if (isNumeric(customValue)) {
+            return {
+              fontWeight: parseInt(customValue),
+            };
+          }
+          return {
+            fontFamily: customValue,
+          };
+        }
+        if (valueStr in theme.fontFamily) {
+          const { value } = parseValue(valueStr, "fontFamily");
+          return {
+            fontFamily: value,
+          };
+        }
+        const { value } = parseValue(valueStr, "fontWeight");
+        return {
+          fontWeight: value,
+        };
       }
 
       case "text": {

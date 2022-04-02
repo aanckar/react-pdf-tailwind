@@ -105,6 +105,9 @@ const tw = createTw({
       colors: {
         badass: "#bada55",
       },
+      fontFamily: {
+        sans: ["Papyrus", "ignored"],
+      },
     },
   },
 });
@@ -609,6 +612,15 @@ describe("Sizing", () => {
 });
 
 describe("Typography", () => {
+  test("font-family", () => {
+    expect(tw("font-sans")).toEqual({
+      fontFamily: "Papyrus",
+    });
+    expect(tw("font-[Comic_Sans]")).toEqual({
+      fontFamily: "Comic Sans",
+    });
+  });
+
   describe("font-size", () => {
     test.each([
       ["xs", [rem(0.75), 1]],
