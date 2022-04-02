@@ -1,5 +1,5 @@
 import resolveConfig from "tailwindcss/resolveConfig";
-import { TailwindConfig } from "tailwindcss/tailwind-config";
+import { TailwindConfig, TailwindTheme } from "tailwindcss/tailwind-config";
 import { capitalize, isNumeric, px, rem } from "./utils";
 
 type StyleSheet = Record<string, string | number>;
@@ -185,11 +185,15 @@ interface Value {
   additionalProperties?: StyleSheet;
 }
 
-function createTw(userConfig?: TailwindConfig) {
+interface Config {
+  theme: TailwindTheme;
+}
+
+function createTw(config?: Config) {
   const { theme } = resolveConfig({
-    ...(userConfig ?? { theme: {} }),
     // Disable Tailwind content warning
     content: ["./dummy/path.js"],
+    theme: config.theme ?? {},
   });
 
   const cache: Record<string, StyleSheet> = {};
