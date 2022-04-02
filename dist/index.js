@@ -28,8 +28,6 @@ function px(value) {
 }
 
 var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -45,7 +43,6 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
@@ -196,7 +193,6 @@ const utilityPatterns = {
   "min-h": "minHeight",
   "max-h": "maxHeight",
   leading: "lineHeight",
-  font: "fontWeight",
   tracking: "letterSpacing",
   indent: "textIndent",
   bg: "backgroundColor",
@@ -216,10 +212,12 @@ const negativeProperties = [
   "order",
   "margin"
 ];
-function createTw(userConfig) {
-  const { theme } = resolveConfig__default["default"](__spreadProps(__spreadValues({}, userConfig != null ? userConfig : { theme: {} }), {
-    content: ["./dummy/path.js"]
-  }));
+function createTw(config) {
+  var _a;
+  const { theme } = resolveConfig__default["default"]({
+    content: ["./dummy/path.js"],
+    theme: (_a = config.theme) != null ? _a : {}
+  });
   const cache = {};
   function transformValue(value, property, isNegative) {
     const sign = isNegative ? -1 : 1;
@@ -254,11 +252,17 @@ function createTw(userConfig) {
         return value;
     }
   }
-  function parseValue(value, property, isNegative) {
-    var _a;
-    const valueParts = value.split("-");
+  function getCustomValue(value) {
     if (value.startsWith("[") && value.endsWith("]")) {
-      const customValue = value.slice(1, value.length - 1).replaceAll("_", " ");
+      return value.slice(1, value.length - 1).replaceAll("_", " ");
+    }
+    return null;
+  }
+  function parseValue(value, property, isNegative) {
+    var _a2;
+    const valueParts = value.split("-");
+    const customValue = getCustomValue(value);
+    if (customValue) {
       if (["#", "rgb", "hsl"].some((prefix) => customValue.startsWith(prefix))) {
         return {
           value: customValue,
@@ -275,6 +279,7 @@ function createTw(userConfig) {
       }
       return {
         value: transformValue(customValue, property, isNegative),
+        type: "other",
         isCustom: true
       };
     }
@@ -286,11 +291,11 @@ function createTw(userConfig) {
       };
     }
     const scaleName = ["top", "right", "bottom", "left"].includes(property) ? "inset" : property;
-    const config = theme[scaleName];
-    if (valueParts.length === 0 || !config) {
+    const config2 = theme[scaleName];
+    if (valueParts.length === 0 || !config2) {
       return { value: null };
     }
-    const result = typeof config === "function" ? (_a = config({ theme })) == null ? void 0 : _a[value] : config == null ? void 0 : config[value];
+    const result = typeof config2 === "function" ? (_a2 = config2({ theme })) == null ? void 0 : _a2[value] : config2 == null ? void 0 : config2[value];
     if (!result) {
       return { value: null };
     }
@@ -361,6 +366,30 @@ function createTw(userConfig) {
               left: value
             };
         }
+      }
+      case "font": {
+        const valueStr = utilityParts.slice(1).join("-");
+        const customValue = getCustomValue(valueStr);
+        if (customValue) {
+          if (isNumeric(customValue)) {
+            return {
+              fontWeight: parseInt(customValue)
+            };
+          }
+          return {
+            fontFamily: customValue
+          };
+        }
+        if (valueStr in theme.fontFamily) {
+          const { value: value2 } = parseValue(valueStr, "fontFamily");
+          return {
+            fontFamily: value2
+          };
+        }
+        const { value } = parseValue(valueStr, "fontWeight");
+        return {
+          fontWeight: value
+        };
       }
       case "text": {
         const valueStr = utilityParts.slice(1).join("-");
@@ -518,7 +547,7 @@ function createTw(userConfig) {
       return null;
     }).filter((i) => i).reduce((acc, val) => {
       var _b;
-      const _a = val, { transform } = _a, rest = __objRest(_a, ["transform"]);
+      const _a2 = val, { transform } = _a2, rest = __objRest(_a2, ["transform"]);
       return __spreadValues(__spreadValues(__spreadValues({}, acc), transform ? { transform: [(_b = acc.transform) != null ? _b : "", transform].join(" ").trim() } : null), rest);
     }, {});
   };
