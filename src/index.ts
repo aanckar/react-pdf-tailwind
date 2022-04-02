@@ -314,14 +314,19 @@ function createTw(config?: Config) {
     }
 
     if (Array.isArray(result)) {
+      const additionalProperties =
+        result[1] && result[1] !== null && typeof result[1] === "object"
+          ? Object.fromEntries(
+              Object.entries(result[1]).map(([key, value]) => [
+                key,
+                transformValue(value, key),
+              ])
+            )
+          : null;
+
       return {
         value: transformValue(result[0], property, isNegative),
-        additionalProperties: Object.fromEntries(
-          Object.entries(result[1]).map(([key, value]) => [
-            key,
-            transformValue(value, key),
-          ])
-        ),
+        ...(additionalProperties ? { additionalProperties } : null),
         type: "unit",
       };
     }

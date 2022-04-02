@@ -98,15 +98,16 @@ const height = [
 
 const tw = createTw({
   theme: {
+    fontFamily: {
+      sans: ["Papyrus", "ignored"],
+      nice: ["Comic Sans"],
+    },
     extend: {
       spacing: {
         "420": "69rem",
       },
       colors: {
         badass: "#bada55",
-      },
-      fontFamily: {
-        sans: ["Papyrus", "ignored"],
       },
     },
   },
@@ -615,6 +616,9 @@ describe("Typography", () => {
   test("font-family", () => {
     expect(tw("font-sans")).toEqual({
       fontFamily: "Papyrus",
+    });
+    expect(tw("font-nice")).toEqual({
+      fontFamily: "Comic Sans",
     });
     expect(tw("font-[Comic_Sans]")).toEqual({
       fontFamily: "Comic Sans",

@@ -22,6 +22,8 @@ function px(value) {
 }
 
 var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -37,6 +39,7 @@ var __spreadValues = (a, b) => {
     }
   return a;
 };
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __objRest = (source, exclude) => {
   var target = {};
   for (var prop in source)
@@ -294,14 +297,15 @@ function createTw(config) {
       return { value: null };
     }
     if (Array.isArray(result)) {
-      return {
-        value: transformValue(result[0], property, isNegative),
-        additionalProperties: Object.fromEntries(Object.entries(result[1]).map(([key, value2]) => [
-          key,
-          transformValue(value2, key)
-        ])),
+      const additionalProperties = result[1] && result[1] !== null && typeof result[1] === "object" ? Object.fromEntries(Object.entries(result[1]).map(([key, value2]) => [
+        key,
+        transformValue(value2, key)
+      ])) : null;
+      return __spreadProps(__spreadValues({
+        value: transformValue(result[0], property, isNegative)
+      }, additionalProperties ? { additionalProperties } : null), {
         type: "unit"
-      };
+      });
     }
     return {
       value: transformValue(result, property, isNegative),
