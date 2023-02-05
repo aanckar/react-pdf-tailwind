@@ -316,6 +316,33 @@ describe("Flexbox", () => {
     });
   });
 
+
+  describe("gap", () => {
+    describe("gap", () => {
+      test.each(spacing)("%s", (key, value) => {
+        expect(tw(`gap-${key}`)).toEqual({
+          gap: value,
+        });
+      });
+    });
+
+    describe("gap-x", () => {
+      test.each(spacing)("%s", (key, value) => {
+        expect(tw(`gap-x-${key}`)).toEqual({
+          columnGap: value,
+        });
+      });
+    });
+
+    describe("gap-y", () => {
+      test.each(spacing)("%s", (key, value) => {
+        expect(tw(`gap-y-${key}`)).toEqual({
+          rowGap: value,
+        });
+      });
+    });
+  });
+
   describe("flex-grow", () => {
     test.each([
       ["grow", 1],

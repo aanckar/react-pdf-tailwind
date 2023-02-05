@@ -126,6 +126,9 @@ const utilityPatterns: Record<string, string | [string, string | string[]]> = {
   // Flexbox
   basis: "flexBasis",
   flex: "flex",
+  gap: "gap",
+  "gap-x": ["gap", "columnGap"],
+  "gap-y": ["gap", "rowGap"],
   grow: "flexGrow",
   shrink: "flexShrink",
   order: "order",
