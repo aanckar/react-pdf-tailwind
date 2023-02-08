@@ -1,16 +1,12 @@
 import dts from "rollup-plugin-dts";
 import esbuild from "rollup-plugin-esbuild";
-import pkg from "./package.json" assert { type: "json" };
 
-const name = pkg.main.replace(/\.js$/, "");
+const name = "dist/index";
 
 const bundle = (config) => ({
   ...config,
   input: "src/index.ts",
-  external: [
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
-  ],
+  external: ["@react-pdf/renderer", "tailwindcss", "tailwindcss/resolveConfig"],
 });
 
 export default [
