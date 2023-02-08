@@ -590,5 +590,5 @@ function createTw(config) {
   };
 }
 
-module.exports = createTw;
+exports.createTw = createTw;
 //# sourceMappingURL=index.js.map

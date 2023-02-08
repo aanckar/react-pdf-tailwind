@@ -4,4 +4,4 @@ type StyleSheet = Record<string, string | number>;
 type Config = Omit<Config$1, "content">;
 declare function createTw(config?: Config): (input: string) => StyleSheet;
 
-export { createTw as default };
+export { createTw };

@@ -588,5 +588,5 @@ function createTw(config) {
   };
 }
 
-export { createTw as default };
+export { createTw };
 //# sourceMappingURL=index.mjs.map
