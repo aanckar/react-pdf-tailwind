@@ -1,6 +1,6 @@
 import dts from "rollup-plugin-dts";
 import esbuild from "rollup-plugin-esbuild";
-const pkg = require("./package.json");
+import pkg from "./package.json" assert { type: "json" };
 
 const name = pkg.main.replace(/\.js$/, "");
 
@@ -18,7 +18,6 @@ export default [
     plugins: [
       esbuild({
         include: /\.ts?$/,
-        bundle: true,
         target: "es2017",
       }),
     ],

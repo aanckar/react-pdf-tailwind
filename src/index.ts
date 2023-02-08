@@ -1,5 +1,5 @@
 import resolveConfig from "tailwindcss/resolveConfig";
-import { TailwindConfig, TailwindTheme } from "tailwindcss/tailwind-config";
+import type { Config as TailwindConfig } from "tailwindcss/types";
 import { capitalize, isNumeric, px, rem } from "./utils";
 
 type StyleSheet = Record<string, string | number>;
@@ -188,9 +188,7 @@ interface Value {
   additionalProperties?: StyleSheet;
 }
 
-interface Config {
-  theme: TailwindTheme;
-}
+type Config = Omit<TailwindConfig, "content">;
 
 function createTw(config?: Config) {
   const { theme } = resolveConfig({
@@ -367,7 +365,6 @@ function createTw(config?: Config) {
           : [pattern];
 
         if (isNegative && !negativeProperties.includes(property)) {
-          console.warn(`Property ${property} does not support negative values`);
           return null;
         }
 
