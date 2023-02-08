@@ -53,6 +53,7 @@ var __objRest = (source, exclude) => {
   return target;
 };
 const exactUtilities = {
+  // Layout
   block: { display: "block" },
   "inline-block": { display: "inline-block" },
   inline: { display: "inline" },
@@ -83,6 +84,7 @@ const exactUtilities = {
   fixed: { position: "fixed" },
   absolute: { position: "absolute" },
   relative: { position: "relative" },
+  // Flexbox
   "flex-row": { flexDirection: "row" },
   "flex-row-reverse": { flexDirection: "row-reverse" },
   "flex-col": { flexDirection: "column" },
@@ -121,21 +123,22 @@ const exactUtilities = {
   "self-center": { alignSelf: "center" },
   "self-baseline": { alignSelf: "baseline" },
   "self-stretch": { alignSelf: "stretch" },
+  // Typography
   italic: { fontStyle: "italic" },
   "not-italic": { fontStyle: "normal" },
   "text-left": { textAlign: "left" },
   "text-center": { textAlign: "center" },
   "text-right": { textAlign: "right" },
   "text-justify": { textAlign: "justify" },
-  underline: { textDecorationLine: "underline" },
-  overline: { textDecorationLine: "overline" },
+  underline: { textDecoration: "underline" },
+  overline: { textDecoration: "overline" },
   "decoration-solid": { textDecorationStyle: "solid" },
   "decoration-double": { textDecorationStyle: "double" },
   "decoration-dotted": { textDecorationStyle: "dotted" },
   "decoration-dashed": { textDecorationStyle: "dashed" },
   "decoration-wavy": { textDecorationStyle: "wavy" },
-  "line-through": { textDecorationLine: "line-through" },
-  "no-underline": { textDecorationLine: "none" },
+  "line-through": { textDecoration: "line-through" },
+  "no-underline": { textDecoration: "none" },
   uppercase: { textTransform: "uppercase" },
   lowercase: { textTransform: "lowercase" },
   capitalize: { textTransform: "capitalize" },
@@ -147,9 +150,11 @@ const exactUtilities = {
   },
   "text-ellipsis": { textOverflow: "ellipsis" },
   "text-clip": { textOverflow: "clip" },
+  // Backgrounds
   "bg-inherit": { backgroundColor: "inherit" },
   "bg-current": { backgroundColor: "currentColor" },
   "bg-transparent": { backgroundColor: "transparent" },
+  // Borders
   "border-solid": { borderStyle: "solid" },
   "border-dashed": { borderStyle: "dashed" },
   "border-dotted": { borderStyle: "dotted" },
@@ -158,17 +163,23 @@ const exactUtilities = {
   "border-none": { borderStyle: "none" }
 };
 const utilityPatterns = {
+  // Layout
   object: "objectPosition",
   top: "top",
   right: "right",
   bottom: "bottom",
   left: "left",
   z: "zIndex",
+  // Flexbox
   basis: "flexBasis",
   flex: "flex",
+  gap: "gap",
+  "gap-x": ["gap", "columnGap"],
+  "gap-y": ["gap", "rowGap"],
   grow: "flexGrow",
   shrink: "flexShrink",
   order: "order",
+  // Spacing
   m: "margin",
   mx: ["margin", ["marginLeft", "marginRight"]],
   my: ["margin", ["marginTop", "marginBottom"]],
@@ -183,18 +194,24 @@ const utilityPatterns = {
   pr: ["padding", "paddingRight"],
   pt: ["padding", "paddingTop"],
   pb: ["padding", "paddingBottom"],
+  // Sizing
   w: "width",
   "min-w": "minWidth",
   "max-w": "maxWidth",
   h: "height",
   "min-h": "minHeight",
   "max-h": "maxHeight",
+  // Typography
   leading: "lineHeight",
   tracking: "letterSpacing",
   indent: "textIndent",
+  // Backgrounds
   bg: "backgroundColor",
+  // Borders
   rounded: "borderRadius",
+  // Effects
   opacity: "opacity",
+  // Transforms
   origin: "transformOrigin"
 };
 const negativeProperties = [
@@ -212,6 +229,7 @@ const negativeProperties = [
 function createTw(config) {
   var _a;
   const { theme } = resolveConfig({
+    // Disable Tailwind content warning
     content: ["./dummy/path.js"],
     theme: (_a = config.theme) != null ? _a : {}
   });
@@ -297,10 +315,12 @@ function createTw(config) {
       return { value: null };
     }
     if (Array.isArray(result)) {
-      const additionalProperties = result[1] && result[1] !== null && typeof result[1] === "object" ? Object.fromEntries(Object.entries(result[1]).map(([key, value2]) => [
-        key,
-        transformValue(value2, key)
-      ])) : null;
+      const additionalProperties = result[1] && result[1] !== null && typeof result[1] === "object" ? Object.fromEntries(
+        Object.entries(result[1]).map(([key, value2]) => [
+          key,
+          transformValue(value2, key)
+        ])
+      ) : null;
       return __spreadProps(__spreadValues({
         value: transformValue(result[0], property, isNegative)
       }, additionalProperties ? { additionalProperties } : null), {
@@ -330,10 +350,13 @@ function createTw(config) {
         const property = Array.isArray(pattern) ? pattern[0] : pattern;
         const mappedProperties = Array.isArray(pattern) ? Array.isArray(pattern[1]) ? pattern[1] : [pattern[1]] : [pattern];
         if (isNegative && !negativeProperties.includes(property)) {
-          console.warn(`Property ${property} does not support negative values`);
           return null;
         }
-        const { value, additionalProperties } = parseValue(rawValue, property, isNegative);
+        const { value, additionalProperties } = parseValue(
+          rawValue,
+          property,
+          isNegative
+        );
         if (value === null) {
           continue;
         }
@@ -391,7 +414,10 @@ function createTw(config) {
       }
       case "text": {
         const valueStr = utilityParts.slice(1).join("-");
-        const { value, additionalProperties, type } = parseValue(valueStr, "fontSize");
+        const { value, additionalProperties, type } = parseValue(
+          valueStr,
+          "fontSize"
+        );
         if (type === "color") {
           return { color: value };
         }
@@ -408,7 +434,9 @@ function createTw(config) {
         return null;
       }
       case "rounded": {
-        const direction = ["t", "r", "b", "l", "tl", "tr", "br", "bl"].find((i) => i === utilityParts[1]);
+        const direction = ["t", "r", "b", "l", "tl", "tr", "br", "bl"].find(
+          (i) => i === utilityParts[1]
+        );
         const valueStr = utilityParts.slice(direction ? 2 : 1).join("-");
         const { value } = parseValue(valueStr || "DEFAULT", "borderRadius");
         switch (direction) {
@@ -455,9 +483,14 @@ function createTw(config) {
         }
       }
       case "border": {
-        const direction = ["x", "y", "t", "r", "b", "l"].find((i) => i === utilityParts[1]);
+        const direction = ["x", "y", "t", "r", "b", "l"].find(
+          (i) => i === utilityParts[1]
+        );
         const valueStr = utilityParts.slice(direction ? 2 : 1).join("-");
-        const { value, type } = parseValue(valueStr || "DEFAULT", "borderWidth");
+        const { value, type } = parseValue(
+          valueStr || "DEFAULT",
+          "borderWidth"
+        );
         const propertySuffix = capitalize(type === "color" ? "color" : "width");
         switch (direction) {
           case "x":
@@ -504,7 +537,11 @@ function createTw(config) {
         }
       }
       case "rotate": {
-        const { value } = parseValue(utilityParts.slice(1).join("-"), "rotate", isNegative);
+        const { value } = parseValue(
+          utilityParts.slice(1).join("-"),
+          "rotate",
+          isNegative
+        );
         return {
           transform: `rotate(${value})`
         };
