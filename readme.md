@@ -7,7 +7,7 @@ Use Tailwind CSS to style PDFs created with [react-pdf](https://github.com/diego
 ```jsx
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import createTw from "react-pdf-tailwind";
+import { createTw } from "react-pdf-tailwind";
 
 // The 'theme' object is your Tailwind theme config
 const tw = createTw({
