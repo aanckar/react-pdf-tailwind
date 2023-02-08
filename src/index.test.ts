@@ -1,4 +1,4 @@
-import createTw from ".";
+import { createTw } from ".";
 import { px, rem } from "./utils";
 
 const colors = [

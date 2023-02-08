@@ -629,4 +629,4 @@ function createTw(config?: Config) {
   };
 }
 
-export default createTw;
+export { createTw };
