@@ -1,4 +1,4 @@
-import createTw from ".";
+import { createTw } from ".";
 import { px, rem } from "./utils";
 
 const colors = [
@@ -116,9 +116,6 @@ const tw = createTw({
 describe("Layout", () => {
   describe("display", () => {
     test.each([
-      ["block", "block"],
-      ["inline-block", "inline-block"],
-      ["inline", "inline"],
       ["flex", "flex"],
       ["hidden", "none"],
     ])("%s", (key, value) => {
@@ -159,36 +156,17 @@ describe("Layout", () => {
   });
 
   describe("overflow", () => {
-    test.each([
-      ["auto", { overflow: "auto" }],
-      ["hidden", { overflow: "hidden" }],
-      ["clip", { overflow: "clip" }],
-      ["visible", { overflow: "visible" }],
-      ["scroll", { overflow: "scroll" }],
-      ["x-auto", { overflowX: "auto" }],
-      ["y-auto", { overflowY: "auto" }],
-      ["x-hidden", { overflowX: "hidden" }],
-      ["y-hidden", { overflowY: "hidden" }],
-      ["x-clip", { overflowX: "clip" }],
-      ["y-clip", { overflowY: "clip" }],
-      ["x-visible", { overflowX: "visible" }],
-      ["y-visible", { overflowY: "visible" }],
-      ["x-scroll", { overflowX: "scroll" }],
-      ["y-scroll", { overflowY: "scroll" }],
-    ])("%s", (key, rule) => {
+    test.each([["hidden", { overflow: "hidden" }]])("%s", (key, rule) => {
       expect(tw(`overflow-${key}`)).toEqual(rule);
     });
   });
 
   describe("position", () => {
-    test.each([["static"], ["fixed"], ["absolute"], ["relative"]])(
-      "%s",
-      (value) => {
-        expect(tw(value)).toEqual({
-          position: value,
-        });
-      }
-    );
+    test.each([["absolute"], ["relative"]])("%s", (value) => {
+      expect(tw(value)).toEqual({
+        position: value,
+      });
+    });
   });
 
   describe("top / right / bottom / left", () => {
@@ -316,7 +294,6 @@ describe("Flexbox", () => {
     });
   });
 
-
   describe("gap", () => {
     describe("gap", () => {
       test.each(spacing)("%s", (key, value) => {
@@ -413,7 +390,6 @@ describe("Flexbox", () => {
       ["center", "center"],
       ["between", "space-between"],
       ["around", "space-around"],
-      ["evenly", "space-evenly"],
     ])("%s", (key, value) => {
       expect(tw(`content-${key}`)).toEqual({
         alignContent: value,
@@ -762,7 +738,6 @@ describe("Typography", () => {
   describe("text-decoration", () => {
     test.each([
       ["underline", "underline"],
-      ["overline", "overline"],
       ["line-through", "line-through"],
       ["no-underline", "none"],
     ])("%s", (key, value) => {
@@ -798,19 +773,12 @@ describe("Typography", () => {
         {
           overflow: "hidden",
           textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
         },
       ],
       [
         "text-ellipsis",
         {
           textOverflow: "ellipsis",
-        },
-      ],
-      [
-        "text-clip",
-        {
-          textOverflow: "clip",
         },
       ],
     ])("%s", (key, value) => {
@@ -836,7 +804,6 @@ describe("Typography", () => {
       ["uppercase", "uppercase"],
       ["lowercase", "lowercase"],
       ["capitalize", "capitalize"],
-      ["normal-case", "none"],
     ])("%s", (key, value) => {
       expect(tw(key)).toEqual({
         textTransform: value,
@@ -1086,14 +1053,7 @@ describe("Borders", () => {
   });
 
   describe("border-style", () => {
-    test.each([
-      ["solid"],
-      ["dashed"],
-      ["dotted"],
-      ["double"],
-      ["hidden"],
-      ["none"],
-    ])("%s", (value) => {
+    test.each([["solid"], ["dashed"], ["dotted"]])("%s", (value) => {
       expect(tw(`border-${value}`)).toEqual({
         borderStyle: value,
       });

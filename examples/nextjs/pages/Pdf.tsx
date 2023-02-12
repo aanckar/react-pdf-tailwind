@@ -1,5 +1,5 @@
 import { PDFViewer, Document, Page, Text, View } from "@react-pdf/renderer";
-import createTw from "../../../dist";
+import { createTw } from "../../../dist";
 
 const tw = createTw({
   theme: {
@@ -19,10 +19,10 @@ export default function Pdf() {
           {[...Array(12)].map((_, i) => (
             <View
               key={i}
-              style={tw("flex-1 min-w-[200pt] p-4 bg-blue-100")}
+              style={tw("flex-1 min-w-[200pt] p-4 flex-col bg-blue-100")}
               wrap={false}
             >
-              <Text style={tw("block text-2xl font-bold text-custom")}>
+              <Text style={tw("text-2xl font-bold text-custom")}>
                 Section {i + 1}
               </Text>
               <Text style={tw("text-sm")}>
