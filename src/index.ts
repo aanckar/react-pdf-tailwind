@@ -26,7 +26,7 @@ interface ResolvedConfig {
   theme: Theme;
 }
 
-function createTw(config: Config) {
+export function createTw(config: Config) {
   // We're using a stricter subset of Tailwind, so we can cast the config to a narrower type
   const resolvedConfig = resolveConfig({
     // Disable Tailwind content warning
@@ -508,5 +508,3 @@ function createTw(config: Config) {
       }, {});
   };
 }
-
-export default createTw;
