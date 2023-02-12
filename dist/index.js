@@ -23,67 +23,63 @@ function px(value) {
   return round(PT_PER_PX * value);
 }
 
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __objRest = (source, exclude) => {
-  var target = {};
-  for (var prop in source)
-    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
-      target[prop] = source[prop];
-  if (source != null && __getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(source)) {
-      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
-        target[prop] = source[prop];
-    }
-  return target;
-};
+const negativeProperties = [
+  "zIndex",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "translate",
+  "scale",
+  "rotate",
+  "order",
+  "margin"
+];
+function isNegativeProperty(key) {
+  return typeof key === "string" && negativeProperties.includes(key);
+}
+const scaledProperties = [
+  "borderRadius",
+  "borderWidth",
+  "flexBasis",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "gap",
+  "height",
+  "inset",
+  "letterSpacing",
+  "lineHeight",
+  "margin",
+  "maxHeight",
+  "maxWidth",
+  "minHeight",
+  "minWidth",
+  "objectPosition",
+  "opacity",
+  "order",
+  "padding",
+  "rotate",
+  "scale",
+  "textIndent",
+  "transformOrigin",
+  "translate",
+  "width",
+  "zIndex"
+];
+function isScaledProperty(key) {
+  return typeof key === "string" && scaledProperties.includes(key);
+}
 const exactUtilities = {
   // Layout
-  block: { display: "block" },
-  "inline-block": { display: "inline-block" },
-  inline: { display: "inline" },
   flex: { display: "flex" },
-  "inline-flex": { display: "inline-flex" },
   hidden: { display: "none" },
   "object-contain": { objectFit: "contain" },
   "object-cover": { objectFit: "cover" },
   "object-fill": { objectFit: "fill" },
   "object-none": { objectFit: "none" },
   "object-scale-down": { objectFit: "scale-down" },
-  "overflow-auto": { overflow: "auto" },
   "overflow-hidden": { overflow: "hidden" },
-  "overflow-clip": { overflow: "clip" },
-  "overflow-visible": { overflow: "visible" },
-  "overflow-scroll": { overflow: "scroll" },
-  "overflow-x-auto": { overflowX: "auto" },
-  "overflow-y-auto": { overflowY: "auto" },
-  "overflow-x-hidden": { overflowX: "hidden" },
-  "overflow-y-hidden": { overflowY: "hidden" },
-  "overflow-x-clip": { overflowX: "clip" },
-  "overflow-y-clip": { overflowY: "clip" },
-  "overflow-x-visible": { overflowX: "visible" },
-  "overflow-y-visible": { overflowY: "visible" },
-  "overflow-x-scroll": { overflowX: "scroll" },
-  "overflow-y-scroll": { overflowY: "scroll" },
-  static: { position: "static" },
-  fixed: { position: "fixed" },
   absolute: { position: "absolute" },
   relative: { position: "relative" },
   // Flexbox
@@ -113,7 +109,6 @@ const exactUtilities = {
   "content-center": { alignContent: "center" },
   "content-between": { alignContent: "space-between" },
   "content-around": { alignContent: "space-around" },
-  "content-evenly": { alignContent: "space-evenly" },
   "items-start": { alignItems: "flex-start" },
   "items-end": { alignItems: "flex-end" },
   "items-center": { alignItems: "center" },
@@ -133,7 +128,6 @@ const exactUtilities = {
   "text-right": { textAlign: "right" },
   "text-justify": { textAlign: "justify" },
   underline: { textDecoration: "underline" },
-  overline: { textDecoration: "overline" },
   "decoration-solid": { textDecorationStyle: "solid" },
   "decoration-double": { textDecorationStyle: "double" },
   "decoration-dotted": { textDecorationStyle: "dotted" },
@@ -144,14 +138,11 @@ const exactUtilities = {
   uppercase: { textTransform: "uppercase" },
   lowercase: { textTransform: "lowercase" },
   capitalize: { textTransform: "capitalize" },
-  "normal-case": { textTransform: "none" },
   truncate: {
     overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap"
+    textOverflow: "ellipsis"
   },
   "text-ellipsis": { textOverflow: "ellipsis" },
-  "text-clip": { textOverflow: "clip" },
   // Backgrounds
   "bg-inherit": { backgroundColor: "inherit" },
   "bg-current": { backgroundColor: "currentColor" },
@@ -159,10 +150,7 @@ const exactUtilities = {
   // Borders
   "border-solid": { borderStyle: "solid" },
   "border-dashed": { borderStyle: "dashed" },
-  "border-dotted": { borderStyle: "dotted" },
-  "border-double": { borderStyle: "double" },
-  "border-hidden": { borderStyle: "hidden" },
-  "border-none": { borderStyle: "none" }
+  "border-dotted": { borderStyle: "dotted" }
 };
 const utilityPatterns = {
   // Layout
@@ -175,9 +163,9 @@ const utilityPatterns = {
   // Flexbox
   basis: "flexBasis",
   flex: "flex",
-  gap: "gap",
   "gap-x": ["gap", "columnGap"],
   "gap-y": ["gap", "rowGap"],
+  gap: "gap",
   grow: "flexGrow",
   shrink: "flexShrink",
   order: "order",
@@ -209,34 +197,53 @@ const utilityPatterns = {
   indent: "textIndent",
   // Backgrounds
   bg: "backgroundColor",
-  // Borders
-  rounded: "borderRadius",
   // Effects
   opacity: "opacity",
   // Transforms
   origin: "transformOrigin"
 };
-const negativeProperties = [
-  "zIndex",
-  "top",
-  "right",
-  "bottom",
-  "left",
-  "translate",
-  "scale",
-  "rotate",
-  "order",
-  "margin"
-];
+
+var __defProp = Object.defineProperty;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __objRest = (source, exclude) => {
+  var target = {};
+  for (var prop in source)
+    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
+      target[prop] = source[prop];
+  if (source != null && __getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(source)) {
+      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
+        target[prop] = source[prop];
+    }
+  return target;
+};
 function createTw(config) {
   var _a;
-  const { theme } = resolveConfig({
+  const resolvedConfig = resolveConfig({
     // Disable Tailwind content warning
     content: ["./dummy/path.js"],
     theme: (_a = config.theme) != null ? _a : {}
   });
+  const theme = resolvedConfig.theme;
   const cache = {};
   function transformValue(value, property, isNegative) {
+    if (value === void 0) {
+      return void 0;
+    }
     const sign = isNegative ? -1 : 1;
     if (typeof value === "number") {
       return sign * value;
@@ -257,7 +264,7 @@ function createTw(config) {
         if (value.endsWith("em")) {
           return rem(sign * Number(value.replace("em", "")));
         }
-        if (isNegative && negativeProperties.includes(property)) {
+        if (isNegative && property && isNegativeProperty(property)) {
           const suffix = ["deg", "%"].find((i) => value.endsWith(i));
           if (suffix) {
             return `${sign * Number(value.replace(suffix, ""))}${suffix}`;
@@ -273,10 +280,9 @@ function createTw(config) {
     if (value.startsWith("[") && value.endsWith("]")) {
       return value.slice(1, value.length - 1).replaceAll("_", " ");
     }
-    return null;
+    return void 0;
   }
   function parseValue(value, property, isNegative) {
-    var _a2;
     const valueParts = value.split("-");
     const customValue = getCustomValue(value);
     if (customValue) {
@@ -304,66 +310,73 @@ function createTw(config) {
       const color = theme.colors[valueParts[0]];
       return {
         value: typeof color === "string" ? color : color == null ? void 0 : color[valueParts[1]],
-        type: "color"
+        type: "color",
+        isCustom: false,
+        additionalProperties: void 0
       };
     }
-    const scaleName = ["top", "right", "bottom", "left"].includes(property) ? "inset" : property;
-    const config2 = theme[scaleName];
-    if (valueParts.length === 0 || !config2) {
-      return { value: null };
+    if (valueParts.length === 0 || !property) {
+      return {
+        value: void 0
+      };
     }
-    const result = typeof config2 === "function" ? (_a2 = config2({ theme })) == null ? void 0 : _a2[value] : config2 == null ? void 0 : config2[value];
-    if (!result) {
-      return { value: null };
-    }
-    if (Array.isArray(result)) {
-      const additionalProperties = result[1] && result[1] !== null && typeof result[1] === "object" ? Object.fromEntries(
-        Object.entries(result[1]).map(([key, value2]) => [
-          key,
-          transformValue(value2, key)
-        ])
-      ) : null;
-      return __spreadProps(__spreadValues({
-        value: transformValue(result[0], property, isNegative)
-      }, additionalProperties ? { additionalProperties } : null), {
-        type: "unit"
-      });
+    const maybeScaledProperty = ["top", "right", "bottom", "left"].includes(
+      property
+    ) ? "inset" : property;
+    if (isScaledProperty(maybeScaledProperty)) {
+      const result = theme[maybeScaledProperty][value];
+      if (Array.isArray(result)) {
+        const additionalProperties = result[1] && result[1] !== null && typeof result[1] === "object" ? Object.fromEntries(
+          Object.entries(result[1]).map(([key, value2]) => [
+            key,
+            transformValue(value2, key)
+          ])
+        ) : null;
+        return __spreadValues({
+          value: transformValue(result[0], property, isNegative),
+          type: "unit",
+          isCustom: false
+        }, additionalProperties ? { additionalProperties } : null);
+      }
+      return {
+        value: transformValue(result, property, isNegative),
+        type: "unit",
+        isCustom: false
+      };
     }
     return {
-      value: transformValue(result, property, isNegative),
-      type: "unit"
+      value: void 0
     };
   }
   function parseUtility(className) {
     const modifierParts = className.split(":");
-    modifierParts.slice(0, modifierParts.length - 1);
     const utilityStr = modifierParts[modifierParts.length - 1];
     if (utilityStr in exactUtilities) {
       return exactUtilities[utilityStr];
     }
     const isNegative = utilityStr.startsWith("-");
     const utilityParts = utilityStr.slice(isNegative ? 1 : 0).split("-");
-    for (let key in utilityPatterns) {
-      const keyParts = key.split("-");
-      const comparisonKey = utilityParts.slice(0, keyParts.length).join("-");
-      if (key === comparisonKey) {
-        const rawValue = className.split(`${key}-`)[1];
-        const pattern = utilityPatterns[key];
-        const property = Array.isArray(pattern) ? pattern[0] : pattern;
-        const mappedProperties = Array.isArray(pattern) ? Array.isArray(pattern[1]) ? pattern[1] : [pattern[1]] : [pattern];
-        if (isNegative && !negativeProperties.includes(property)) {
-          return null;
-        }
-        const { value, additionalProperties } = parseValue(
-          rawValue,
-          property,
-          isNegative
-        );
-        if (value === null) {
-          continue;
-        }
-        return __spreadValues(__spreadValues({}, Object.fromEntries(mappedProperties.map((prop) => [prop, value]))), additionalProperties != null ? additionalProperties : null);
+    const matchingUtilityPatternKey = Object.keys(utilityPatterns).find(
+      (key) => {
+        const keyParts = key.split("-");
+        const comparisonKey = utilityParts.slice(0, keyParts.length).join("-");
+        return key === comparisonKey;
       }
+    );
+    if (matchingUtilityPatternKey) {
+      const rawValue = className.split(`${matchingUtilityPatternKey}-`)[1];
+      const pattern = utilityPatterns[matchingUtilityPatternKey];
+      const property = Array.isArray(pattern) ? pattern[0] : pattern;
+      const mappedProperties = Array.isArray(pattern) ? Array.isArray(pattern[1]) ? pattern[1] : [pattern[1]] : [pattern];
+      if (isNegative && !isNegativeProperty(property)) {
+        return void 0;
+      }
+      const { value, additionalProperties } = parseValue(
+        rawValue,
+        property,
+        isNegative
+      );
+      return __spreadValues(__spreadValues({}, Object.fromEntries(mappedProperties.map((prop) => [prop, value]))), additionalProperties != null ? additionalProperties : null);
     }
     switch (utilityParts[0]) {
       case "inset": {
@@ -403,7 +416,7 @@ function createTw(config) {
             fontFamily: customValue
           };
         }
-        if (valueStr in theme.fontFamily) {
+        if (theme.fontFamily && valueStr in theme.fontFamily) {
           const { value: value2 } = parseValue(valueStr, "fontFamily");
           return {
             fontFamily: value2
@@ -433,7 +446,7 @@ function createTw(config) {
             textDecorationColor: value
           };
         }
-        return null;
+        return void 0;
       }
       case "rounded": {
         const direction = ["t", "r", "b", "l", "tl", "tr", "br", "bl"].find(
@@ -568,27 +581,38 @@ function createTw(config) {
         }
       }
     }
-    return null;
+    return void 0;
+  }
+  function handleInvalidClassName(className) {
+    console.warn(`Invalid class: "${className}"`);
   }
   return function(input) {
     const classNames = input.split(" ").map((i) => i.trim());
-    return classNames.map((c) => {
-      if (c in cache) {
-        return cache[c];
+    return classNames.map((className) => {
+      if (className in cache) {
+        return cache[className];
       }
-      const parsed = parseUtility(c);
-      if (parsed) {
-        cache[c] = parsed;
+      const parsed = parseUtility(className);
+      if (parsed && Object.values(parsed).every((v) => typeof v !== "undefined")) {
+        cache[className] = parsed;
         return parsed;
+      } else {
+        handleInvalidClassName(className);
       }
-      return null;
-    }).filter((i) => i).reduce((acc, val) => {
+      return void 0;
+    }).reduce((acc, val) => {
       var _b;
-      const _a2 = val, { transform } = _a2, rest = __objRest(_a2, ["transform"]);
-      return __spreadValues(__spreadValues(__spreadValues({}, acc), transform ? { transform: [(_b = acc.transform) != null ? _b : "", transform].join(" ").trim() } : null), rest);
+      if (!val) {
+        return acc;
+      }
+      if ("transform" in val) {
+        const _a2 = val, { transform } = _a2, rest = __objRest(_a2, ["transform"]);
+        return __spreadValues(__spreadValues(__spreadValues({}, acc), transform ? { transform: [(_b = acc.transform) != null ? _b : "", transform].join(" ").trim() } : null), rest);
+      }
+      return __spreadValues(__spreadValues({}, acc), val);
     }, {});
   };
 }
 
-module.exports = createTw;
+exports.createTw = createTw;
 //# sourceMappingURL=index.js.map
