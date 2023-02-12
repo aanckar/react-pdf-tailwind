@@ -2,6 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@react-pdf/renderer': ^3.1.3
+  '@react-pdf/types': ^2.2.0
   '@types/jest': ^29.4.0
   autoprefixer: ^10.4.13
   esbuild: ^0.17.6
@@ -19,6 +20,7 @@ dependencies:
   tailwindcss: 3.2.4_postcss@8.4.21
 
 devDependencies:
+  '@react-pdf/types': 2.2.0
   '@types/jest': 29.4.0
   autoprefixer: 10.4.13_postcss@8.4.21
   esbuild: 0.17.6
@@ -991,7 +993,6 @@ packages:
 
   /@react-pdf/types/2.2.0:
     resolution: {integrity: sha512-sJDzaeTVcwmZId1uaTHxW0CT5BKUHP5yzvjAAsEqur+kFD/qGZB02ahi5RQuvscnqDofcks3QR0sB78dR0Pp0g==}
-    dev: false
 
   /@react-pdf/yoga/4.0.1:
     resolution: {integrity: sha512-T8krZBCbbfnSUhWEJLrX5HoGu982ZiWoyArimFTK4HEO/L+TKVsteJ21UPQr0F6G/8Q/FuwCEyLu0hir1Pr6xQ==}

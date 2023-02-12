@@ -1,39 +1,64 @@
 import resolveConfig from "tailwindcss/resolveConfig";
-import type { Config as TailwindConfig } from "tailwindcss/types";
+import type { Config as TailwindConfig } from "tailwindcss";
+import type { Style } from "@react-pdf/types";
 import { capitalize, isNumeric, px, rem } from "./utils";
 
-type StyleSheet = Record<string, string | number>;
+const scaledProperties = [
+  "borderRadius",
+  "borderWidth",
+  "flexBasis",
+  "fontFamily",
+  "fontSize",
+  "fontWeight",
+  "gap",
+  "height",
+  "inset",
+  "letterSpacing",
+  "lineHeight",
+  "margin",
+  "maxHeight",
+  "maxWidth",
+  "minHeight",
+  "minWidth",
+  "objectPosition",
+  "opacity",
+  "order",
+  "padding",
+  "rotate",
+  "scale",
+  "textIndent",
+  "transformOrigin",
+  "translate",
+  "width",
+  "zIndex",
+] as const;
 
-const exactUtilities: Record<string, StyleSheet> = {
+export type ScaledProperty = typeof scaledProperties[number];
+
+export function isScaledProperty(key: unknown): key is ScaledProperty {
+  return typeof key === "string" && scaledProperties.includes(key as any);
+}
+
+export type Theme = Record<
+  ScaledProperty,
+  Record<string, string | [string, Style] | undefined>
+> & {
+  colors: Record<
+    string,
+    Record<string, string | undefined> | string | undefined
+  >;
+};
+
+const exactUtilities: Record<string, Style> = {
   // Layout
-  block: { display: "block" },
-  "inline-block": { display: "inline-block" },
-  inline: { display: "inline" },
   flex: { display: "flex" },
-  "inline-flex": { display: "inline-flex" },
   hidden: { display: "none" },
   "object-contain": { objectFit: "contain" },
   "object-cover": { objectFit: "cover" },
   "object-fill": { objectFit: "fill" },
   "object-none": { objectFit: "none" },
   "object-scale-down": { objectFit: "scale-down" },
-  "overflow-auto": { overflow: "auto" },
   "overflow-hidden": { overflow: "hidden" },
-  "overflow-clip": { overflow: "clip" },
-  "overflow-visible": { overflow: "visible" },
-  "overflow-scroll": { overflow: "scroll" },
-  "overflow-x-auto": { overflowX: "auto" },
-  "overflow-y-auto": { overflowY: "auto" },
-  "overflow-x-hidden": { overflowX: "hidden" },
-  "overflow-y-hidden": { overflowY: "hidden" },
-  "overflow-x-clip": { overflowX: "clip" },
-  "overflow-y-clip": { overflowY: "clip" },
-  "overflow-x-visible": { overflowX: "visible" },
-  "overflow-y-visible": { overflowY: "visible" },
-  "overflow-x-scroll": { overflowX: "scroll" },
-  "overflow-y-scroll": { overflowY: "scroll" },
-  static: { position: "static" },
-  fixed: { position: "fixed" },
   absolute: { position: "absolute" },
   relative: { position: "relative" },
   // Flexbox
@@ -63,7 +88,6 @@ const exactUtilities: Record<string, StyleSheet> = {
   "content-center": { alignContent: "center" },
   "content-between": { alignContent: "space-between" },
   "content-around": { alignContent: "space-around" },
-  "content-evenly": { alignContent: "space-evenly" },
   "items-start": { alignItems: "flex-start" },
   "items-end": { alignItems: "flex-end" },
   "items-center": { alignItems: "center" },
@@ -83,7 +107,6 @@ const exactUtilities: Record<string, StyleSheet> = {
   "text-right": { textAlign: "right" },
   "text-justify": { textAlign: "justify" },
   underline: { textDecoration: "underline" },
-  overline: { textDecoration: "overline" },
   "decoration-solid": { textDecorationStyle: "solid" },
   "decoration-double": { textDecorationStyle: "double" },
   "decoration-dotted": { textDecorationStyle: "dotted" },
@@ -94,14 +117,11 @@ const exactUtilities: Record<string, StyleSheet> = {
   uppercase: { textTransform: "uppercase" },
   lowercase: { textTransform: "lowercase" },
   capitalize: { textTransform: "capitalize" },
-  "normal-case": { textTransform: "none" },
   truncate: {
     overflow: "hidden",
     textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
   },
   "text-ellipsis": { textOverflow: "ellipsis" },
-  "text-clip": { textOverflow: "clip" },
   // Backgrounds
   "bg-inherit": { backgroundColor: "inherit" },
   "bg-current": { backgroundColor: "currentColor" },
@@ -110,9 +130,6 @@ const exactUtilities: Record<string, StyleSheet> = {
   "border-solid": { borderStyle: "solid" },
   "border-dashed": { borderStyle: "dashed" },
   "border-dotted": { borderStyle: "dotted" },
-  "border-double": { borderStyle: "double" },
-  "border-hidden": { borderStyle: "hidden" },
-  "border-none": { borderStyle: "none" },
 };
 
 const utilityPatterns: Record<string, string | [string, string | string[]]> = {
@@ -126,9 +143,9 @@ const utilityPatterns: Record<string, string | [string, string | string[]]> = {
   // Flexbox
   basis: "flexBasis",
   flex: "flex",
-  gap: "gap",
   "gap-x": ["gap", "columnGap"],
   "gap-y": ["gap", "rowGap"],
+  gap: "gap",
   grow: "flexGrow",
   shrink: "flexShrink",
   order: "order",
@@ -160,8 +177,6 @@ const utilityPatterns: Record<string, string | [string, string | string[]]> = {
   indent: "textIndent",
   // Backgrounds
   bg: "backgroundColor",
-  // Borders
-  rounded: "borderRadius",
   // Effects
   opacity: "opacity",
   // Transforms
@@ -181,29 +196,33 @@ const negativeProperties = [
   "margin",
 ];
 
-interface Value {
-  value: string | number;
-  type?: "color" | "unit" | "numeric" | "other";
-  isCustom?: boolean;
-  additionalProperties?: StyleSheet;
-}
-
 type Config = Omit<TailwindConfig, "content">;
 
-function createTw(config?: Config) {
-  const { theme } = resolveConfig({
+interface ResolvedConfig {
+  theme: Theme;
+}
+
+function createTw(config: Config) {
+  // We're using a stricter subset of Tailwind, so we can cast the config to a narrower type
+  const resolvedConfig = resolveConfig({
     // Disable Tailwind content warning
     content: ["./dummy/path.js"],
     theme: config.theme ?? {},
-  });
+  }) as unknown as ResolvedConfig;
 
-  const cache: Record<string, StyleSheet> = {};
+  const theme = resolvedConfig.theme;
+
+  const cache: Record<string, Style> = {};
 
   function transformValue(
-    value: string | number,
+    value: string | number | undefined,
     property?: string,
     isNegative?: boolean
-  ): string | number {
+  ) {
+    if (value === undefined) {
+      return undefined;
+    }
+
     const sign = isNegative ? -1 : 1;
 
     if (typeof value === "number") {
@@ -229,7 +248,7 @@ function createTw(config?: Config) {
         if (value.endsWith("em")) {
           return rem(sign * Number(value.replace("em", "")));
         }
-        if (isNegative && negativeProperties.includes(property)) {
+        if (isNegative && property && negativeProperties.includes(property)) {
           const suffix = ["deg", "%"].find((i) => value.endsWith(i));
           if (suffix) {
             return `${sign * Number(value.replace(suffix, ""))}${suffix}`;
@@ -246,7 +265,14 @@ function createTw(config?: Config) {
     if (value.startsWith("[") && value.endsWith("]")) {
       return value.slice(1, value.length - 1).replaceAll("_", " ");
     }
-    return null;
+    return undefined;
+  }
+
+  interface Value {
+    value: string | number | undefined;
+    type?: "color" | "unit" | "numeric" | "other";
+    isCustom?: boolean;
+    additionalProperties?: Style;
   }
 
   function parseValue(
@@ -286,104 +312,118 @@ function createTw(config?: Config) {
     }
 
     // Color
-    // Exception for font-weight: black (not a color)
+    // Exception for "font-weight: black" (not a color)
     if (valueParts[0] in theme.colors && property !== "fontWeight") {
       // TODO alpha colors like gray-500/50 etc
-      const color = (theme.colors as any)[valueParts[0]];
+      const color = theme.colors[valueParts[0]];
       return {
         value: typeof color === "string" ? color : color?.[valueParts[1]],
-        type: "color",
+        type: "color" as const,
+        isCustom: false,
+        additionalProperties: undefined,
       };
     }
 
-    // Unit
-    const scaleName = ["top", "right", "bottom", "left"].includes(property)
+    if (valueParts.length === 0 || !property) {
+      return {
+        value: undefined,
+      };
+    }
+
+    // Scaled properties
+    const maybeScaledProperty = ["top", "right", "bottom", "left"].includes(
+      property
+    )
       ? "inset"
       : property;
-    const config = (theme as any)[scaleName];
-    if (valueParts.length === 0 || !config) {
-      return { value: null };
-    }
-    const result = (
-      typeof config === "function"
-        ? config({ theme })?.[value]
-        : config?.[value]
-    ) as [string, StyleSheet] | string;
 
-    if (!result) {
-      return { value: null };
-    }
+    if (isScaledProperty(maybeScaledProperty)) {
+      const result = theme[maybeScaledProperty][value];
 
-    if (Array.isArray(result)) {
-      const additionalProperties =
-        result[1] && result[1] !== null && typeof result[1] === "object"
-          ? Object.fromEntries(
-              Object.entries(result[1]).map(([key, value]) => [
-                key,
-                transformValue(value, key),
-              ])
-            )
-          : null;
+      // Some utilities may set multiple properties
+      // eg: text-2xl => ["1.5rem", { lineHeight: "2rem"}]
+      if (Array.isArray(result)) {
+        const additionalProperties =
+          result[1] && result[1] !== null && typeof result[1] === "object"
+            ? Object.fromEntries(
+                Object.entries(result[1]).map(([key, value]) => [
+                  key,
+                  transformValue(value, key),
+                ])
+              )
+            : null;
+
+        return {
+          value: transformValue(result[0], property, isNegative),
+          type: "unit",
+          isCustom: false,
+          ...(additionalProperties ? { additionalProperties } : null),
+        };
+      }
 
       return {
-        value: transformValue(result[0], property, isNegative),
-        ...(additionalProperties ? { additionalProperties } : null),
+        value: transformValue(result, property, isNegative),
         type: "unit",
+        isCustom: false,
       };
     }
 
+    // No match
     return {
-      value: transformValue(result, property, isNegative),
-      type: "unit",
+      value: undefined,
     };
   }
 
-  function parseUtility(className: string): any {
+  function parseUtility(
+    className: string
+  ): Style | Record<string, string | number | undefined> | undefined {
     const modifierParts = className.split(":");
-    const modifiers = modifierParts.slice(0, modifierParts.length - 1);
     const utilityStr = modifierParts[modifierParts.length - 1];
 
+    // Exact utilities
     if (utilityStr in exactUtilities) {
       return exactUtilities[utilityStr];
     }
 
+    // Utility patterns
     const isNegative = utilityStr.startsWith("-");
     const utilityParts = utilityStr.slice(isNegative ? 1 : 0).split("-");
 
-    for (let key in utilityPatterns) {
-      // Key can have multiple parts (eg. min-w)
-      const keyParts = key.split("-");
-      const comparisonKey = utilityParts.slice(0, keyParts.length).join("-");
-      if (key === comparisonKey) {
-        const rawValue = className.split(`${key}-`)[1];
-        const pattern = utilityPatterns[key];
-        const property = Array.isArray(pattern) ? pattern[0] : pattern;
-        const mappedProperties = Array.isArray(pattern)
-          ? Array.isArray(pattern[1])
-            ? pattern[1]
-            : [pattern[1]]
-          : [pattern];
-
-        if (isNegative && !negativeProperties.includes(property)) {
-          return null;
-        }
-
-        const { value, additionalProperties } = parseValue(
-          rawValue,
-          property,
-          isNegative
-        );
-        if (value === null) {
-          continue;
-        }
-
-        return {
-          ...Object.fromEntries(mappedProperties.map((prop) => [prop, value])),
-          ...(additionalProperties ?? null),
-        };
+    const matchingUtilityPatternKey = Object.keys(utilityPatterns).find(
+      (key) => {
+        const keyParts = key.split("-");
+        const comparisonKey = utilityParts.slice(0, keyParts.length).join("-");
+        return key === comparisonKey;
       }
+    );
+
+    if (matchingUtilityPatternKey) {
+      const rawValue = className.split(`${matchingUtilityPatternKey}-`)[1];
+      const pattern = utilityPatterns[matchingUtilityPatternKey];
+      const property = Array.isArray(pattern) ? pattern[0] : pattern;
+      const mappedProperties = Array.isArray(pattern)
+        ? Array.isArray(pattern[1])
+          ? pattern[1]
+          : [pattern[1]]
+        : [pattern];
+
+      if (isNegative && !negativeProperties.includes(property)) {
+        return undefined;
+      }
+
+      const { value, additionalProperties } = parseValue(
+        rawValue,
+        property,
+        isNegative
+      );
+
+      return {
+        ...Object.fromEntries(mappedProperties.map((prop) => [prop, value])),
+        ...(additionalProperties ?? null),
+      };
     }
 
+    // Special utilities
     switch (utilityParts[0]) {
       case "inset": {
         const direction = ["x", "y"].find((i) => i === utilityParts[1]);
@@ -423,7 +463,7 @@ function createTw(config?: Config) {
             fontFamily: customValue,
           };
         }
-        if (valueStr in theme.fontFamily) {
+        if (theme.fontFamily && valueStr in theme.fontFamily) {
           const { value } = parseValue(valueStr, "fontFamily");
           return {
             fontFamily: value,
@@ -456,7 +496,7 @@ function createTw(config?: Config) {
           };
         }
         // Only decoration color (not thickness) supported for now
-        return null;
+        return undefined;
       }
 
       case "rounded": {
@@ -464,6 +504,7 @@ function createTw(config?: Config) {
           (i) => i === utilityParts[1]
         );
         const valueStr = utilityParts.slice(direction ? 2 : 1).join("-");
+        // console.log("get real val");
         const { value } = parseValue(valueStr || "DEFAULT", "borderRadius");
         switch (direction) {
           case "t":
@@ -598,34 +639,49 @@ function createTw(config?: Config) {
       }
     }
 
-    return null;
+    // No match
+    return undefined;
+  }
+
+  function handleInvalidClassName(className: string) {
+    console.warn(`Invalid class: "${className}"`);
   }
 
   return function (input: string) {
     const classNames = input.split(" ").map((i) => i.trim());
     return classNames
-      .map((c) => {
-        if (c in cache) {
-          return cache[c];
+      .map((className) => {
+        if (className in cache) {
+          return cache[className];
         }
-        const parsed = parseUtility(c);
-        if (parsed) {
-          cache[c] = parsed;
+        const parsed = parseUtility(className);
+        if (
+          parsed &&
+          Object.values(parsed).every((v) => typeof v !== "undefined")
+        ) {
+          cache[className] = parsed;
           return parsed;
+        } else {
+          handleInvalidClassName(className);
         }
-        return null;
+        return undefined;
       })
-      .filter((i) => i)
-      .reduce((acc, val) => {
-        const { transform, ...rest } = val;
-        return {
-          ...acc,
-          ...(transform
-            ? { transform: [acc.transform ?? "", transform].join(" ").trim() }
-            : null),
-          ...rest,
-        };
-      }, {}) as StyleSheet;
+      .reduce<Style>((acc, val) => {
+        if (!val) {
+          return acc;
+        }
+        if ("transform" in val) {
+          const { transform, ...rest } = val;
+          return {
+            ...acc,
+            ...(transform
+              ? { transform: [acc.transform ?? "", transform].join(" ").trim() }
+              : null),
+            ...rest,
+          };
+        }
+        return { ...acc, ...val };
+      }, {});
   };
 }
 

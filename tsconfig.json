@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["esnext"],
+    "strict": true,
+    "lib": ["esnext", "DOM"],
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
