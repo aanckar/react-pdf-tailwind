@@ -582,7 +582,7 @@ function createTw(config) {
     return void 0;
   }
   function handleInvalidClassName(className) {
-    console.warn(`Invalid class: "${className}"`);
+    console.warn(`react-pdf-tailwind: Invalid class "${className}"`);
   }
   return function(input) {
     const classNames = input.split(" ").map((i) => i.trim());
