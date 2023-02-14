@@ -15,6 +15,7 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --watch",
     "lint": "tsc",
     "test": "jest",
     "test:watch": "jest --watchAll"
