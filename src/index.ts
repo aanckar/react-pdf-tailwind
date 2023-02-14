@@ -137,11 +137,20 @@ export function createTw(config: Config) {
 
     // Color
     // Exception for "font-weight: black" (not a color)
-    if (valueParts[0] in theme.colors && property !== "fontWeight") {
+    if (
+      valueParts[0] &&
+      valueParts[0] in theme.colors &&
+      property !== "fontWeight"
+    ) {
       // TODO alpha colors like gray-500/50 etc
       const color = theme.colors[valueParts[0]];
       return {
-        value: typeof color === "string" ? color : color?.[valueParts[1]],
+        value:
+          typeof color === "string"
+            ? color
+            : valueParts[1]
+            ? color?.[valueParts[1]]
+            : undefined,
         type: "color" as const,
         isCustom: false,
         additionalProperties: undefined,
@@ -205,13 +214,15 @@ export function createTw(config: Config) {
     const utilityStr = modifierParts[modifierParts.length - 1];
 
     // Exact utilities
-    if (utilityStr in exactUtilities) {
+    if (utilityStr && utilityStr in exactUtilities) {
       return exactUtilities[utilityStr];
     }
 
     // Utility patterns
-    const isNegative = utilityStr.startsWith("-");
-    const utilityParts = utilityStr.slice(isNegative ? 1 : 0).split("-");
+    const isNegative = utilityStr ? utilityStr.startsWith("-") : false;
+    const utilityParts = utilityStr
+      ? utilityStr.slice(isNegative ? 1 : 0).split("-")
+      : [];
 
     const matchingUtilityPatternKey = Object.keys(utilityPatterns).find(
       (key) => {
@@ -231,7 +242,7 @@ export function createTw(config: Config) {
           : [pattern[1]]
         : [pattern];
 
-      if (isNegative && !isNegativeProperty(property)) {
+      if (!rawValue || (isNegative && !isNegativeProperty(property))) {
         return undefined;
       }
 
