@@ -1,5 +1,5 @@
 import { PDFViewer, Document, Page, Text, View } from "@react-pdf/renderer";
-import { createTw } from "../../../dist";
+import { createTw } from "../../../src";
 
 const tw = createTw({
   theme: {
