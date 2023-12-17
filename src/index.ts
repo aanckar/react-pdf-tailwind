@@ -1,4 +1,4 @@
-import resolveConfig from "tailwindcss/resolveConfig";
+import resolveConfig from "tailwindcss/resolveConfig.js";
 import type { Config as TailwindConfig } from "tailwindcss";
 import type { Style } from "@react-pdf/types";
 import { capitalize, isNumeric, px, rem } from "./utils";
