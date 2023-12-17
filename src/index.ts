@@ -339,7 +339,6 @@ export function createTw(config: Config) {
           (i) => i === utilityParts[1]
         );
         const valueStr = utilityParts.slice(direction ? 2 : 1).join("-");
-        // console.log("get real val");
         const { value } = parseValue(valueStr || "DEFAULT", "borderRadius");
         switch (direction) {
           case "t":
