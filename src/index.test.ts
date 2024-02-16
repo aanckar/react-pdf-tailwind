@@ -114,6 +114,10 @@ const tw = createTw({
   },
 });
 
+const customPtPerRem = 16;
+
+const twWithCustomPtPerRem = createTw({}, {ptPerRem: customPtPerRem});
+
 describe("Layout", () => {
   describe("display", () => {
     test.each([
@@ -647,6 +651,30 @@ describe("Typography", () => {
       ["[69rem]", [rem(69)]],
     ])("%s", (key, [fontSize, lineHeight]) => {
       expect(tw(`text-${key}`)).toEqual({
+        fontSize,
+        ...(lineHeight ? { lineHeight } : null),
+      });
+    });
+  });
+
+  describe("custom font-size", () => {
+    test.each([
+      ["xs", [rem(0.75, customPtPerRem), 1]],
+      ["sm", [rem(0.875, customPtPerRem), 1.25]],
+      ["base", [rem(1, customPtPerRem), 1.5]],
+      ["lg", [rem(1.125, customPtPerRem), 1.75]],
+      ["xl", [rem(1.25, customPtPerRem), 1.75]],
+      ["2xl", [rem(1.5, customPtPerRem), 2]],
+      ["3xl", [rem(1.875, customPtPerRem), 2.25]],
+      ["4xl", [rem(2.25, customPtPerRem), 2.5]],
+      ["5xl", [rem(3, customPtPerRem), 1]],
+      ["6xl", [rem(3.75, customPtPerRem), 1]],
+      ["7xl", [rem(4.5, customPtPerRem), 1]],
+      ["8xl", [rem(6, customPtPerRem), 1]],
+      ["9xl", [rem(8, customPtPerRem), 1]],
+      ["[69rem]", [rem(69, customPtPerRem)]],
+    ])("%s", (key, [fontSize, lineHeight]) => {
+      expect(twWithCustomPtPerRem(`text-${key}`)).toEqual({
         fontSize,
         ...(lineHeight ? { lineHeight } : null),
       });
