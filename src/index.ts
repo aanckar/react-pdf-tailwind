@@ -26,7 +26,11 @@ interface ResolvedConfig {
   theme: Theme;
 }
 
-export function createTw(config: Config) {
+type Options = {
+  ptPerRem?: number;
+}
+
+export function createTw(config: Config, options?: Options) {
   // We're using a stricter subset of Tailwind, so we can cast the config to a narrower type
   const resolvedConfig = resolveConfig({
     // Disable Tailwind content warning
@@ -67,10 +71,10 @@ export function createTw(config: Config) {
           return px(sign * Number(value.replace("px", "")));
         }
         if (value.endsWith("rem")) {
-          return rem(sign * Number(value.replace("rem", "")));
+          return rem(sign * Number(value.replace("rem", "")), options?.ptPerRem);
         }
         if (value.endsWith("em")) {
-          return rem(sign * Number(value.replace("em", "")));
+          return rem(sign * Number(value.replace("em", "")), options?.ptPerRem);
         }
         if (isNegative && property && isNegativeProperty(property)) {
           const suffix = ["deg", "%"].find((i) => value.endsWith(i));
