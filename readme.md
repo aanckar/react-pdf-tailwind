@@ -53,6 +53,10 @@ npm install react-pdf-tailwind
 
 - Supports most of the CSS properties that make sense in a PDF context, and are supported by `react-pdf` (see [this list](https://react-pdf.org/styling#valid-css-properties))
 - Default font family classes are excluded, since you have to [include your own fonts anyway](https://react-pdf.org/fonts)
-- Internally uses `pt` as the default unit (supported units can be found [here](https://react-pdf.org/styling#valid-units)), using the convention `1rem = 12pt`
+- Internally uses `pt` as the default unit (supported units can be found [here](https://react-pdf.org/styling#valid-units)), using the default convention `1rem = 12pt`. If you wish to adjust this value, you can do so by providing a second parameter in the `createTw` function and specifying your desired `ptPerRem` value:
+  ```jsx
+  const tw = createTw({ theme: { // ...
+    }}, { ptPerRem: 16 });
+  ````
 - Since `react-pdf` uses [Yoga](https://yogalayout.com/) internally, some defaults differ from the web standard (for example, `flex-direction` defaults to `column`, which can be fixed by adding the `flex-row` class where needed)
 - Modifiers like breakpoints (which could technically make sense) aren't supported yet
