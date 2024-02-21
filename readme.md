@@ -49,10 +49,28 @@ More detailed examples can be found in the [examples](https://github.com/aanckar
 npm install react-pdf-tailwind
 ```
 
+## Usage
+
+The `createTw` function takes two arguments: the first is a Tailwind config object (which currently only looks at the `theme` settings), and the second is an optional options object with the following defaults:
+
+```js
+const tw = createTw(
+  // Tailwind config
+  {
+    theme: ...
+  },
+  // Additional options
+  {
+    // Set the base font size in points (see note below regarding units)
+    ptPerRem: 12,
+  }
+);
+```
+
 ## Notes
 
 - Supports most of the CSS properties that make sense in a PDF context, and are supported by `react-pdf` (see [this list](https://react-pdf.org/styling#valid-css-properties))
 - Default font family classes are excluded, since you have to [include your own fonts anyway](https://react-pdf.org/fonts)
-- Internally uses `pt` as the default unit (supported units can be found [here](https://react-pdf.org/styling#valid-units)), using the convention `1rem = 12pt`
+- Internally uses `pt` as the default unit (supported units can be found [here](https://react-pdf.org/styling#valid-units)), using the default convention `1rem = 12pt` (this can be changed in the options)
 - Since `react-pdf` uses [Yoga](https://yogalayout.com/) internally, some defaults differ from the web standard (for example, `flex-direction` defaults to `column`, which can be fixed by adding the `flex-row` class where needed)
 - Modifiers like breakpoints (which could technically make sense) aren't supported yet

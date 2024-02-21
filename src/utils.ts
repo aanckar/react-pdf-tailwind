@@ -16,8 +16,8 @@ export function capitalize(string: string) {
   return `${string.charAt(0).toUpperCase()}${string.slice(1).toLowerCase()}`;
 }
 
-export function rem(value: number) {
-  return round(PT_PER_REM * value);
+export function rem(value: number, ptPerRem: number = PT_PER_REM) {
+  return round(ptPerRem * value);
 }
 
 export function px(value: number) {
