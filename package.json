@@ -1,6 +1,6 @@
 {
   "name": "react-pdf-tailwind",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Use Tailwind CSS to style PDFs created with react-pdf",
   "keywords": [
     "tailwind",
