@@ -1,6 +1,14 @@
 const PT_PER_PX = 1;
 const PT_PER_REM = 12;
 
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+export type ExtendableDeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? ExtendableDeepPartial<T[P]> : T[P];
+} & Record<string, unknown>;
+
 export function round(value: number) {
   return Math.round(value * 1e6) / 1e6;
 }

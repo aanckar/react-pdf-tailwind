@@ -1,46 +1,43 @@
-import resolveConfig from "tailwindcss/resolveConfig.js";
-import type { Config as TailwindConfig } from "tailwindcss";
-import type { Style } from "@react-pdf/types";
-import { capitalize, isNumeric, px, rem } from "./utils";
+import { Style } from "@react-pdf/types";
+import defaultTheme from "tailwindcss/defaultTheme";
+import { tailwindColors } from "./colors";
 import {
-  type ScaledProperty,
+  exactUtilities,
   isNegativeProperty,
   isScaledProperty,
-  exactUtilities,
   utilityPatterns,
 } from "./properties";
+import { capitalize, ExtendableDeepPartial, isNumeric, px, rem } from "./utils";
 
-export type Theme = Record<
-  ScaledProperty,
-  Record<string, string | [string, Style] | undefined>
-> & {
-  colors: Record<
-    string,
-    Record<string, string | undefined> | string | undefined
-  >;
+type DefaultTheme = typeof defaultTheme;
+
+type ThemeBaseConfig = Omit<
+  ExtendableDeepPartial<typeof defaultTheme>,
+  "colors" | "fontFamily"
+>;
+
+type ThemeConfig = ThemeBaseConfig & {
+  colors?: Record<string, string | Record<number, string>>;
+  fontFamily?: Partial<DefaultTheme["fontFamily"]> & {
+    [key: string]: string | string[];
+  };
 };
-
-type Config = Omit<TailwindConfig, "content">;
-
-interface ResolvedConfig {
-  theme: Theme;
-}
 
 type Options = {
   ptPerRem?: number;
+};
+
+function themeResolver(name: string) {
+  return defaultTheme[name as keyof typeof defaultTheme] ?? {};
 }
 
-export function createTw(config: Config, options?: Options) {
-  // We're using a stricter subset of Tailwind, so we can cast the config to a narrower type
-  const resolvedConfig = resolveConfig({
-    // Disable Tailwind content warning
-    content: ["./dummy/path.js"],
-    theme: config.theme ?? {},
-  }) as unknown as ResolvedConfig;
+export function createTw(config: ThemeConfig, options?: Options) {
+  const theme = { ...defaultTheme, ...config };
 
-  const theme = resolvedConfig.theme;
+  // Default colors are in OKLCH from v4 onwards, so we use the hex versions here for compatibility
+  const colors = { ...tailwindColors, ...(config.colors ?? {}) };
 
-  const cache: Record<string, Style> = {};
+  const cache: Record<string, MergedStyle> = {};
 
   function transformValue(
     value: string | number | undefined,
@@ -48,6 +45,15 @@ export function createTw(config: Config, options?: Options) {
     isNegative?: boolean
   ) {
     if (value === undefined) {
+      return undefined;
+    }
+
+    if (typeof value !== "string" && typeof value !== "number") {
+      console.warn(
+        "Invalid value type passed to transformValue",
+        value,
+        property
+      );
       return undefined;
     }
 
@@ -71,7 +77,10 @@ export function createTw(config: Config, options?: Options) {
           return px(sign * Number(value.replace("px", "")));
         }
         if (value.endsWith("rem")) {
-          return rem(sign * Number(value.replace("rem", "")), options?.ptPerRem);
+          return rem(
+            sign * Number(value.replace("rem", "")),
+            options?.ptPerRem
+          );
         }
         if (value.endsWith("em")) {
           return rem(sign * Number(value.replace("em", "")), options?.ptPerRem);
@@ -96,11 +105,21 @@ export function createTw(config: Config, options?: Options) {
     return undefined;
   }
 
+  // Example: text-2xl => ["1.5rem", { lineHeight: "2rem"}]
+  type MultiProperty = [
+    string,
+    string | Record<string, string | number | undefined>
+  ];
+
+  function isMultiProperty(value: unknown): value is MultiProperty {
+    return Array.isArray(value);
+  }
+
   interface Value {
     value: string | number | undefined;
     type?: "color" | "unit" | "numeric" | "other";
     isCustom?: boolean;
-    additionalProperties?: Style;
+    additionalProperties?: MergedStyle;
   }
 
   function parseValue(
@@ -141,19 +160,15 @@ export function createTw(config: Config, options?: Options) {
 
     // Color
     // Exception for "font-weight: black" (not a color)
-    if (
-      valueParts[0] &&
-      valueParts[0] in theme.colors &&
-      property !== "fontWeight"
-    ) {
+    if (valueParts[0] && valueParts[0] in colors && property !== "fontWeight") {
       // TODO alpha colors like gray-500/50 etc
-      const color = theme.colors[valueParts[0]];
+      const color = colors[valueParts[0] as keyof typeof colors];
       return {
         value:
           typeof color === "string"
             ? color
-            : valueParts[1]
-            ? color?.[valueParts[1]]
+            : valueParts[1] && typeof valueParts[1] === "string"
+            ? color?.[valueParts[1] as unknown as keyof typeof color]
             : undefined,
         type: "color" as const,
         isCustom: false,
@@ -175,11 +190,25 @@ export function createTw(config: Config, options?: Options) {
       : property;
 
     if (isScaledProperty(maybeScaledProperty)) {
-      const result = theme[maybeScaledProperty][value];
+      // Check if property exists directly on tailwind theme object (like eg. fontSize)
+      const key = maybeScaledProperty as keyof typeof theme;
+      const themeProp = theme[key];
+      let result: string | number | undefined;
 
-      // Some utilities may set multiple properties
-      // eg: text-2xl => ["1.5rem", { lineHeight: "2rem"}]
-      if (Array.isArray(result)) {
+      if (typeof themeProp === "function") {
+        // Here the theme value expects a function that resolves values within the theme object
+        result = (themeProp as any)({ theme: themeResolver })?.[value];
+      } else if (themeProp && value in themeProp) {
+        result = themeProp?.[value as keyof (typeof theme)[typeof key]];
+      }
+
+      if (!result) {
+        // Check if property uses tailwind spacing scale
+        result = theme.spacing[value as keyof typeof theme.spacing];
+      }
+
+      // Some utilities may set multiple properties (eg. text-* sets both fontSize and lineHeight)
+      if (isMultiProperty(result)) {
         const additionalProperties =
           result[1] && result[1] !== null && typeof result[1] === "object"
             ? Object.fromEntries(
@@ -211,9 +240,12 @@ export function createTw(config: Config, options?: Options) {
     };
   }
 
-  function parseUtility(
-    className: string
-  ): Style | Record<string, string | number | undefined> | undefined {
+  type MergedStyle =
+    | Style
+    | Record<string, string | number | undefined>
+    | undefined;
+
+  function parseUtility(className: string): MergedStyle {
     const modifierParts = className.split(":");
     const utilityStr = modifierParts[modifierParts.length - 1];
 

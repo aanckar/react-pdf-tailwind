@@ -1,15 +1,17 @@
+import { describe, expect, test } from "vitest";
 import { createTw } from ".";
-import { px, rem } from "./utils";
-import { describe, test, expect } from "vitest";
+import { rem } from "./utils";
 
 const colors = [
   ["inherit", "inherit"],
   ["current", "currentColor"],
   ["transparent", "transparent"],
-  ["black", "#000"],
-  ["white", "#fff"],
+  ["black", "black"],
+  ["white", "white"],
   ["gray-500", "#6b7280"],
   ["badass", "#bada55"],
+  ["myblue-300", "#5778d4"],
+  ["myblue-500", "#2546a1"],
   ["[#bada55]", "#bada55"],
   ["[rgb(69,69,69)]", "rgb(69,69,69)"],
   ["[hsl(69,69,69)]", "hsl(69,69,69)"],
@@ -98,25 +100,25 @@ const height = [
 ];
 
 const tw = createTw({
-  theme: {
-    fontFamily: {
-      sans: ["Papyrus", "ignored"],
-      nice: ["Comic Sans"],
-    },
-    extend: {
-      spacing: {
-        "420": "69rem",
-      },
-      colors: {
-        badass: "#bada55",
-      },
+  fontFamily: {
+    sans: ["Papyrus", "ignored"],
+    nice: ["Comic Sans"],
+  },
+  spacing: {
+    "420": "69rem",
+  },
+  colors: {
+    badass: "#bada55",
+    myblue: {
+      300: "#5778d4",
+      500: "#2546a1",
     },
   },
 });
 
 const customPtPerRem = 16;
 
-const twWithCustomPtPerRem = createTw({}, {ptPerRem: customPtPerRem});
+const twWithCustomPtPerRem = createTw({}, { ptPerRem: customPtPerRem });
 
 describe("Layout", () => {
   describe("display", () => {
@@ -1240,10 +1242,10 @@ describe("Transforms", () => {
 
 describe("Combinations", () => {
   test("Misc", () => {
-    expect(tw("w-24 h-12 max-w-screen-md text-gray-500")).toEqual({
+    expect(tw("w-24 h-12 max-w-3xl text-gray-500")).toEqual({
       width: rem(6),
       height: rem(3),
-      maxWidth: px(768),
+      maxWidth: rem(48),
       color: "#6b7280",
     });
   });

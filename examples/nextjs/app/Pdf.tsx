@@ -1,13 +1,9 @@
-import { PDFViewer, Document, Page, Text, View } from "@react-pdf/renderer";
+import { Document, Page, PDFViewer, Text, View } from "@react-pdf/renderer";
 import { createTw } from "../../../src";
 
 const tw = createTw({
-  theme: {
-    extend: {
-      colors: {
-        custom: "cornflowerblue",
-      },
-    },
+  colors: {
+    custom: "cornflowerblue",
   },
 });
 

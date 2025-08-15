@@ -15,7 +15,7 @@ const negativeProperties = [
 
 export function isNegativeProperty(
   key: unknown
-): key is typeof negativeProperties[number] {
+): key is (typeof negativeProperties)[number] {
   return typeof key === "string" && negativeProperties.includes(key as any);
 }
 
@@ -49,7 +49,7 @@ const scaledProperties = [
   "zIndex",
 ] as const;
 
-export type ScaledProperty = typeof scaledProperties[number];
+export type ScaledProperty = (typeof scaledProperties)[number];
 
 export function isScaledProperty(key: unknown): key is ScaledProperty {
   return typeof key === "string" && scaledProperties.includes(key as any);
@@ -112,12 +112,22 @@ export const exactUtilities: Record<string, Style> = {
   "text-center": { textAlign: "center" },
   "text-right": { textAlign: "right" },
   "text-justify": { textAlign: "justify" },
+  "text-inherit": { color: "inherit" },
+  "text-current": { color: "currentColor" },
+  "text-transparent": { color: "transparent" },
+  "text-black": { color: "black" },
+  "text-white": { color: "white" },
   underline: { textDecoration: "underline" },
   "decoration-solid": { textDecorationStyle: "solid" },
   "decoration-double": { textDecorationStyle: "double" },
   "decoration-dotted": { textDecorationStyle: "dotted" },
   "decoration-dashed": { textDecorationStyle: "dashed" },
   "decoration-wavy": { textDecorationStyle: "wavy" },
+  "decoration-inherit": { textDecorationColor: "inherit" },
+  "decoration-current": { textDecorationColor: "currentColor" },
+  "decoration-transparent": { textDecorationColor: "transparent" },
+  "decoration-black": { textDecorationColor: "black" },
+  "decoration-white": { textDecorationColor: "white" },
   "line-through": { textDecoration: "line-through" },
   "no-underline": { textDecoration: "none" },
   uppercase: { textTransform: "uppercase" },
@@ -132,10 +142,65 @@ export const exactUtilities: Record<string, Style> = {
   "bg-inherit": { backgroundColor: "inherit" },
   "bg-current": { backgroundColor: "currentColor" },
   "bg-transparent": { backgroundColor: "transparent" },
+  "bg-black": { backgroundColor: "black" },
+  "bg-white": { backgroundColor: "white" },
   // Borders
   "border-solid": { borderStyle: "solid" },
   "border-dashed": { borderStyle: "dashed" },
   "border-dotted": { borderStyle: "dotted" },
+  "border-inherit": { borderColor: "inherit" },
+  "border-current": { borderColor: "currentColor" },
+  "border-transparent": { borderColor: "transparent" },
+  "border-black": { borderColor: "black" },
+  "border-white": { borderColor: "white" },
+  "border-x-inherit": {
+    borderLeftColor: "inherit",
+    borderRightColor: "inherit",
+  },
+  "border-x-current": {
+    borderLeftColor: "currentColor",
+    borderRightColor: "currentColor",
+  },
+  "border-x-transparent": {
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+  },
+  "border-x-black": { borderLeftColor: "black", borderRightColor: "black" },
+  "border-x-white": { borderLeftColor: "white", borderRightColor: "white" },
+  "border-y-inherit": {
+    borderTopColor: "inherit",
+    borderBottomColor: "inherit",
+  },
+  "border-y-current": {
+    borderTopColor: "currentColor",
+    borderBottomColor: "currentColor",
+  },
+  "border-y-transparent": {
+    borderTopColor: "transparent",
+    borderBottomColor: "transparent",
+  },
+  "border-y-black": { borderTopColor: "black", borderBottomColor: "black" },
+  "border-y-white": { borderTopColor: "white", borderBottomColor: "white" },
+  "border-t-inherit": { borderTopColor: "inherit" },
+  "border-t-current": { borderTopColor: "currentColor" },
+  "border-t-transparent": { borderTopColor: "transparent" },
+  "border-t-black": { borderTopColor: "black" },
+  "border-t-white": { borderTopColor: "white" },
+  "border-r-inherit": { borderRightColor: "inherit" },
+  "border-r-current": { borderRightColor: "currentColor" },
+  "border-r-transparent": { borderRightColor: "transparent" },
+  "border-r-black": { borderRightColor: "black" },
+  "border-r-white": { borderRightColor: "white" },
+  "border-b-inherit": { borderBottomColor: "inherit" },
+  "border-b-current": { borderBottomColor: "currentColor" },
+  "border-b-transparent": { borderBottomColor: "transparent" },
+  "border-b-black": { borderBottomColor: "black" },
+  "border-b-white": { borderBottomColor: "white" },
+  "border-l-inherit": { borderLeftColor: "inherit" },
+  "border-l-current": { borderLeftColor: "currentColor" },
+  "border-l-transparent": { borderLeftColor: "transparent" },
+  "border-l-black": { borderLeftColor: "black" },
+  "border-l-white": { borderLeftColor: "white" },
 };
 
 export const utilityPatterns: Record<

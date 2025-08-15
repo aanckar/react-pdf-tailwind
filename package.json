@@ -1,6 +1,6 @@
 {
   "name": "react-pdf-tailwind",
-  "version": "2.3.0",
+  "version": "3.0.0",
   "description": "Use Tailwind CSS to style PDFs created with react-pdf",
   "keywords": [
     "tailwind",
@@ -18,20 +18,22 @@
     "dev": "tsup src/index.ts --watch",
     "lint": "tsc",
     "test": "vitest",
+    "test:ui": "vitest --ui",
     "test:run": "vitest --run"
   },
   "files": [
     "dist"
   ],
   "dependencies": {
-    "@react-pdf/renderer": "^3.1.14",
-    "tailwindcss": "^3.3.6"
+    "@react-pdf/renderer": "^4.3.0",
+    "@react-pdf/types": "^2.3.4",
+    "tailwindcss": "^4.1.12"
   },
   "devDependencies": {
-    "@react-pdf/types": "^2.3.4",
-    "@types/node": "^20.10.4",
+    "@types/node": "^24.2.1",
+    "@vitest/ui": "3.2.4",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3",
-    "vitest": "^1.0.4"
+    "vitest": "^3.2.4"
   }
 }
